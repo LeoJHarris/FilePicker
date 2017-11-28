@@ -1,9 +1,9 @@
-﻿
-using LeoJHarris.FilePicker.Abstractions;
-using System;
-
-namespace LeoJHarris.FilePicker
+﻿namespace LeoJHarris.FilePicker
 {
+    using System;
+
+    using LeoJHarris.FilePicker.Abstractions;
+
     /// <summary>
     /// Cross platform FilePicker implemenations
     /// </summary>
@@ -18,11 +18,12 @@ namespace LeoJHarris.FilePicker
         {
             get
             {
-                var ret = Implementation.Value;
+                IFilePicker ret = Implementation.Value;
                 if (ret == null)
                 {
                     throw NotImplementedInReferenceAssembly();
                 }
+
                 return ret;
             }
         }

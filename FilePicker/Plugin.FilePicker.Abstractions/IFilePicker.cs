@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-
-namespace LeoJHarris.FilePicker.Abstractions
+﻿namespace LeoJHarris.FilePicker.Abstractions
 {
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Interface for FilePicker
     /// </summary>
@@ -9,9 +9,15 @@ namespace LeoJHarris.FilePicker.Abstractions
     {
         Task<FileData> PickFile();
 
-        Task<bool> SaveFile(FileData fileToSave);
+        /// <summary>
+        /// Saves the file 
+        /// </summary>
+        /// <param name="fileToSave">File to save</param>
+        /// <param name="optionalFolderName">Optional folder to create when saving file in</param>
+        /// <returns></returns>
+        Task<string> SaveFileAsync(FileData fileToSave, string optionalFolderName = null);
 
-        void OpenFile(string fileToOpen);
+        void OpenFile(string fullPathToFile);
 
         void OpenFile(FileData fileToOpen);
     }

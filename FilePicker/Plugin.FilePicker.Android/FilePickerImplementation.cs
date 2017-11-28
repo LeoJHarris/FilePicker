@@ -1,19 +1,25 @@
-using Android.App;
-using Android.Content;
-using Android.Runtime;
-using Java.IO;
-using LeoJHarris.FilePicker.Abstractions;
-using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace LeoJHarris.FilePicker
 {
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using Android.App;
+    using Android.Content;
+    using Android.Runtime;
+
+    using Java.IO;
+
+    using LeoJHarris.FilePicker.Abstractions;
+
+    using File = Java.IO.File;
+    using Uri = Android.Net.Uri;
+
     /// <summary>
     /// Implementation for Feature
     /// </summary>
-    ///
     [Preserve(AllMembers = true)]
     public class FilePickerImplementation : IFilePicker
     {
@@ -23,150 +29,147 @@ namespace LeoJHarris.FilePicker
 
         public FilePickerImplementation()
         {
-            _context = Application.Context;
+            this._context = Application.Context;
         }
 
         public async Task<FileData> PickFile()
         {
-            var media = await TakeMediaAsync("file/*", Intent.ActionGetContent);
+            FileData media = await this.TakeMediaAsync("file/*", Intent.ActionGetContent).ConfigureAwait(true);
 
             return media;
         }
 
         private Task<FileData> TakeMediaAsync(string type, string action)
         {
-            var id = GetRequestId();
+            int id = this.GetRequestId();
 
-            var ntcs = new TaskCompletionSource<FileData>(id);
+            TaskCompletionSource<FileData> taskCompletionSource = new TaskCompletionSource<FileData>(id);
 
-            if (Interlocked.CompareExchange(ref _completionSource, ntcs, null) != null)
+            if (Interlocked.CompareExchange(ref this._completionSource, taskCompletionSource, null) != null)
                 throw new InvalidOperationException("Only one operation can be active at a time");
 
             try
             {
-                var pickerIntent = new Intent(this._context, typeof(FilePickerActivity));
+                Intent pickerIntent = new Intent(this._context, typeof(FilePickerActivity));
                 pickerIntent.SetFlags(ActivityFlags.NewTask);
 
                 this._context.StartActivity(pickerIntent);
 
                 EventHandler<FilePickerEventArgs> handler = null;
-                EventHandler<EventArgs> cancelledHandler = null;
+                EventHandler<EventArgs> canceledHandler = null;
 
                 handler = (s, e) =>
                 {
-                    var tcs = Interlocked.Exchange(ref _completionSource, null);
+                    TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
 
                     FilePickerActivity.FilePicked -= handler;
 
                     tcs?.SetResult(new FileData(e.FileByte, e.FileName, e.FilePath));
                 };
 
-                cancelledHandler = (s, e) =>
+                canceledHandler = (s, e) =>
                 {
-                    var tcs = Interlocked.Exchange(ref _completionSource, null);
+                    TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
 
-                    FilePickerActivity.FilePickCancelled -= cancelledHandler;
+                    FilePickerActivity.FilePickCancelled -= canceledHandler;
 
                     tcs?.SetResult(null);
                 };
 
-                FilePickerActivity.FilePickCancelled += cancelledHandler;
+                FilePickerActivity.FilePickCancelled += canceledHandler;
                 FilePickerActivity.FilePicked += handler;
             }
-            catch (Exception exAct)
+            catch (Exception ex)
             {
-                Debug.Write(exAct);
+                Debug.Write(ex);
             }
 
-            return _completionSource.Task;
+            return this._completionSource.Task;
         }
 
         private int GetRequestId()
         {
-            int id = _requestId;
+            int id = this._requestId;
 
-            if (_requestId == int.MaxValue)
-                _requestId = 0;
-            else
-                _requestId++;
+            if (this._requestId == int.MaxValue) this._requestId = 0;
+            else this._requestId++;
 
             return id;
         }
 
-        public async Task<bool> SaveFile(FileData fileToSave)
+        public async Task<string> SaveFileAsync(FileData fileToSave, string optionalFolderName = null)
         {
             try
             {
-                var myFile = new File(Android.OS.Environment.ExternalStorageDirectory, fileToSave.FileName);
+                File myFile;
+                FileOutputStream fos;
 
-                if (myFile.Exists())
-                    return true;
+                File document = Application.Context.GetExternalFilesDir(Android.OS.Environment.DirectoryDocuments);
 
-                var fos = new FileOutputStream(myFile.Path);
+                if (!string.IsNullOrEmpty(optionalFolderName))
+                {
+                    DirectoryInfo directoryInfo =
+                        Directory.CreateDirectory(Path.Combine(document.AbsolutePath, optionalFolderName));
 
-                fos.Write(fileToSave.DataArray);
+                    myFile = new File(directoryInfo.FullName, fileToSave.FileName);
+                }
+                else
+                {
+                    myFile = new File(document, fileToSave.FileName);
+                }
+
+                if (System.IO.File.Exists(myFile.Path))
+                {
+                    return myFile.Path;
+                }
+
+                fos = new FileOutputStream(myFile.Path);
+                await fos.WriteAsync(fileToSave.DataArray).ConfigureAwait(false);
                 fos.Close();
-
-                return true;
+                return myFile.Path;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                return false;
+                return string.Empty;
             }
         }
 
-        //public string SaveFile(FileData fileToSave)
-        //{
-        //    try
-        //    {
-        //        var myFile = new File(Android.OS.Environment.ExternalStorageDirectory, fileToSave.FileName);
-
-        //        if (myFile.Exists())
-        //            return myFile.Path;
-
-        //        var fos = new FileOutputStream(myFile.Path);
-
-        //        fos.Write(fileToSave.DataArray);
-        //        fos.Close();
-
-        //        return myFile.Path;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine(ex.Message);
-        //        return string.Empty;
-        //    }
-        //}
-
         public void OpenFile(File fileToOpen)
         {
-            var uri = Android.Net.Uri.FromFile(fileToOpen);
-            var intent = new Intent();
-            var mime = IOUtil.GetMimeType(uri.ToString());
+            Uri uri = Uri.FromFile(fileToOpen);
+            Intent intent = new Intent();
+            string mime = IOUtil.GetMimeType(uri.ToString());
 
             intent.SetAction(Intent.ActionView);
             intent.SetDataAndType(uri, mime);
-            intent.SetFlags(ActivityFlags.NewTask);
+            intent.SetFlags(ActivityFlags.ClearWhenTaskReset | ActivityFlags.NewTask);
 
-            _context.StartActivity(intent);
+            this._context.StartActivity(intent);
         }
 
-        public void OpenFile(string fileToOpen)
+        public void OpenFile(string fullPathToFile)
         {
-            var myFile = new File(Android.OS.Environment.ExternalStorageState, fileToOpen);
+            File myFile = new File(fullPathToFile);
 
-            OpenFile(myFile);
+            this.OpenFile(myFile);
         }
 
         public async void OpenFile(FileData fileToOpen)
         {
-            var myFile = new File(Android.OS.Environment.ExternalStorageState, fileToOpen.FileName);
+            File myFile = new File(
+                Application.Context.GetExternalFilesDir(Android.OS.Environment.DirectoryDocuments),
+                fileToOpen.FileName);
 
             if (!myFile.Exists())
-                await SaveFile(fileToOpen);
+            {
+                if (string.IsNullOrEmpty(await this.SaveFileAsync(fileToOpen).ConfigureAwait(false)))
+                {
+                    return;
+                }
+            }
 
-            OpenFile(fileToOpen);
+            this.OpenFile(myFile.Name);
         }
     }
 }
