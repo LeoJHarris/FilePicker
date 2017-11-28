@@ -1,11 +1,8 @@
-﻿using System;
-using System.IO;
-
-namespace LeoJHarris.FilePicker.Abstractions
+﻿namespace LeoJHarris.FilePicker.Abstractions
 {
-    /// <summary>
-    /// The object used as a wrapper for the file picked by the user
-    /// </summary>
+    using System;
+    using System.IO;
+
     public class FileData : IDisposable
     {
         private string _fileName;
@@ -15,20 +12,21 @@ namespace LeoJHarris.FilePicker.Abstractions
         private readonly Func<Stream> _streamGetter;
 
         public FileData()
-        { }
+        {
+        }
 
-        private byte[] _dataArray = null;
+        private byte[] _dataArray;
 
         public FileData(byte[] dataArray, string fileName, string filePath)
         {
-            _dataArray = dataArray;
-            _fileName = fileName;
-            _filePath = filePath;
+            this._dataArray = dataArray;
+            this._fileName = fileName;
+            this._filePath = filePath;
         }
 
         public byte[] DataArray
         {
-            get { return _dataArray; }
+            get { return this._dataArray; }
         }
 
         /// <summary>
@@ -38,18 +36,18 @@ namespace LeoJHarris.FilePicker.Abstractions
         {
             get
             {
-                if (_isDisposed)
+                if (this._isDisposed)
                     throw new ObjectDisposedException(null);
 
-                return _fileName;
+                return this._fileName;
             }
 
             set
             {
-                if (_isDisposed)
+                if (this._isDisposed)
                     throw new ObjectDisposedException(null);
 
-                _fileName = value;
+                this._fileName = value;
             }
         }
 
@@ -60,18 +58,18 @@ namespace LeoJHarris.FilePicker.Abstractions
         {
             get
             {
-                if (_isDisposed)
+                if (this._isDisposed)
                     throw new ObjectDisposedException(null);
 
-                return _filePath;
+                return this._filePath;
             }
 
             set
             {
-                if (_isDisposed)
+                if (this._isDisposed)
                     throw new ObjectDisposedException(null);
 
-                _filePath = value;
+                this._filePath = value;
             }
         }
 
@@ -81,30 +79,30 @@ namespace LeoJHarris.FilePicker.Abstractions
         /// <returns></returns>
         public Stream GetStream()
         {
-            if (_isDisposed)
+            if (this._isDisposed)
                 throw new ObjectDisposedException(null);
 
-            return _streamGetter();
+            return this._streamGetter();
         }
 
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)
         {
-            if (_isDisposed)
+            if (this._isDisposed)
                 return;
 
-            _isDisposed = true;
-            _dispose?.Invoke(disposing);
+            this._isDisposed = true;
+            this._dispose?.Invoke(disposing);
         }
 
         ~FileData()
         {
-            Dispose(false);
+            this.Dispose(false);
         }
     }
 }
