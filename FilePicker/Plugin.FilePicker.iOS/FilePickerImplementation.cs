@@ -207,15 +207,11 @@ namespace LeoJHarris.FilePicker
             docControl.PresentOpenInMenu(frame, lastView, true);
         }
 
-        public void OpenFile(string fileToOpen)
+        public void OpenFile(string fullPathToFile)
         {
-            string documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
-            string fileName = Path.Combine(documents, fileToOpen);
-
-            if (NSFileManager.DefaultManager.FileExists(fileName))
+            if (NSFileManager.DefaultManager.FileExists(fullPathToFile))
             {
-                NSUrl url = new NSUrl(fileName, true);
+                NSUrl url = new NSUrl(fullPathToFile, true);
                 this.OpenFile(url);
             }
         }
@@ -226,16 +222,15 @@ namespace LeoJHarris.FilePicker
 
             string fileName = Path.Combine(documents, fileToOpen.FileName);
 
-            if (NSFileManager.DefaultManager.FileExists(fileName))
+            if (!NSFileManager.DefaultManager.FileExists(fileName))
+            {
+                await this.SaveFileAsync(fileToOpen).ConfigureAwait(true);
+            }
+            else
             {
                 NSUrl url = new NSUrl(fileName, true);
 
                 this.OpenFile(url);
-            }
-            else
-            {
-                await this.SaveFileAsync(fileToOpen).ConfigureAwait(true);
-                this.OpenFile(fileToOpen);
             }
         }
     }

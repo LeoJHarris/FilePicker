@@ -151,25 +151,30 @@ namespace LeoJHarris.FilePicker
         public void OpenFile(string fullPathToFile)
         {
             File myFile = new File(fullPathToFile);
-
-            this.OpenFile(myFile);
+            if (myFile.Exists())
+            {
+                this.OpenFile(myFile);
+            }
         }
 
         public async void OpenFile(FileData fileToOpen)
         {
             File myFile = new File(
-                Application.Context.GetExternalFilesDir(Android.OS.Environment.DirectoryDocuments),
+                Application.Context.GetExternalFilesDir(
+                    Android.OS.Environment.DirectoryDocuments),
                 fileToOpen.FileName);
 
             if (!myFile.Exists())
             {
-                if (string.IsNullOrEmpty(await this.SaveFileAsync(fileToOpen).ConfigureAwait(false)))
+                string pathToFile = await this.SaveFileAsync(fileToOpen)
+                    .ConfigureAwait(true);
+                if (string.IsNullOrEmpty(pathToFile))
                 {
                     return;
                 }
             }
 
-            this.OpenFile(myFile.Name);
+            this.OpenFile(myFile.Path);
         }
     }
 }
