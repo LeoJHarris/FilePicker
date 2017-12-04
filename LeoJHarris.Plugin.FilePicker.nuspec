@@ -8,7 +8,7 @@
     <owners>Leonard Harris</owners>
     <licenseUrl>https://github.com/LeoJHarris/FilePicker/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/LeoJHarris/FilePicker</projectUrl>
-    <iconUrl>https://raw.githubusercontent.com/LeoJHarris/AdvancedEntry/master/thumb3.png</iconUrl>
+    <iconUrl>https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/NuGet_project_logo.svg/1200px-NuGet_project_logo.svg.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       Advanced entry for Xamarin.forms projects that extends the current Xamarin.forms entry
@@ -22,8 +22,6 @@
     <file src="FilePicker\Plugin.FilePicker.Abstractions\bin\Release\LeoJHarris.FilePicker.Plugin.Abstractions*.*" target="lib\portable-net45+wp80+win8+wpa81" />
 
     <file src="FilePicker\Plugin.FilePicker\bin\Release\LeoJHarris.FilePicker*.*" target="lib\portable-net45+wp80+win8+wpa81" />
-
-
 
     <file src="FilePicker\Plugin.FilePicker.Abstractions\bin\Release\LeoJHarris.FilePicker.Abstractions*.*" target="lib\Xamarin.iOS10\LeoJHarris.FilePicker.dll" />
 

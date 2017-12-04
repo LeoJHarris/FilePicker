@@ -59,22 +59,22 @@ namespace LeoJHarris.FilePicker
                 EventHandler<EventArgs> canceledHandler = null;
 
                 handler = (s, e) =>
-                {
-                    TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
+                    {
+                        TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
 
-                    FilePickerActivity.FilePicked -= handler;
+                        FilePickerActivity.FilePicked -= handler;
 
-                    tcs?.SetResult(new FileData(e.FileByte, e.FileName, e.FilePath));
-                };
+                        tcs?.SetResult(new FileData(e.FileByte, e.FileName, e.FilePath));
+                    };
 
                 canceledHandler = (s, e) =>
-                {
-                    TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
+                    {
+                        TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
 
-                    FilePickerActivity.FilePickCancelled -= canceledHandler;
+                        FilePickerActivity.FilePickCancelled -= canceledHandler;
 
-                    tcs?.SetResult(null);
-                };
+                        tcs?.SetResult(null);
+                    };
 
                 FilePickerActivity.FilePickCancelled += canceledHandler;
                 FilePickerActivity.FilePicked += handler;

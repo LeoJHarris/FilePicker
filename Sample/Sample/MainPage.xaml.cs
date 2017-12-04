@@ -35,7 +35,7 @@
             }
             else
             {
-                await this.DisplayAlert("Please pick a .jpeg, .jpg or .png file", "File type not supported", "OK").ConfigureAwait(false);
+                await this.DisplayAlert("Name of the file:" + file.FileName + " and path too file", "File info", "OK");
             }
         }
 

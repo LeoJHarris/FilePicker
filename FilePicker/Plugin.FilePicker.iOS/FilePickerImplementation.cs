@@ -1,6 +1,7 @@
 namespace LeoJHarris.FilePicker
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -91,64 +92,50 @@ namespace LeoJHarris.FilePicker
             }
         }
 
-        /// <summary>
-        /// Lets the user pick a file with the systems default file picker
-        /// For iOS iCloud drive needs to be configured
-        /// </summary>
-        /// <returns></returns>
         public async Task<FileData> PickFile()
         {
-            FileData media = await this.TakeMediaAsync().ConfigureAwait(true);
-
-            return media;
+            return await this.TakeMediaAsync();
         }
 
         private Task<FileData> TakeMediaAsync()
         {
-            int id = this.GetRequestId();
-
-            TaskCompletionSource<FileData> taskCompletionSource = new TaskCompletionSource<FileData>(id);
-
-            if (Interlocked.CompareExchange(ref this._completionSource, taskCompletionSource, null) != null)
+            if (Interlocked.CompareExchange<TaskCompletionSource<FileData>>(ref this._completionSource, new TaskCompletionSource<FileData>((object)this.GetRequestId()), (TaskCompletionSource<FileData>)null) != null)
                 throw new InvalidOperationException("Only one operation can be active at a time");
-
-            string[] allowedUtis = new string[]
-                                       {
-                                           UTType.UTF8PlainText, UTType.PlainText, UTType.RTF, UTType.PNG, UTType.Text,
-                                           UTType.PDF, UTType.Image, UTType.UTF16PlainText, UTType.FileURL
-                                       };
-
-            UIDocumentMenuViewController importMenu =
-                new UIDocumentMenuViewController(allowedUtis, UIDocumentPickerMode.Import)
-                {
-                    Delegate = this,
-                    ModalPresentationStyle =
-                            UIModalPresentationStyle
-                                .Popover
-                };
-
-            UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController(importMenu, true, null);
-
-            UIPopoverPresentationController presPopover = importMenu.PopoverPresentationController;
-
-            if (presPopover != null)
+            UIDocumentMenuViewController menuViewController1 = new UIDocumentMenuViewController(new string[9]
             {
-                presPopover.SourceView = UIApplication.SharedApplication.KeyWindow.RootViewController.View;
-                presPopover.PermittedArrowDirections = UIPopoverArrowDirection.Down;
+        (string) UTType.UTF8PlainText,
+        (string) UTType.PlainText,
+        (string) UTType.RTF,
+        (string) UTType.PNG,
+        (string) UTType.Text,
+        (string) UTType.PDF,
+        (string) UTType.Image,
+        (string) UTType.UTF16PlainText,
+        (string) UTType.FileURL
+            }, UIDocumentPickerMode.Import);
+            menuViewController1.Delegate = (IUIDocumentMenuDelegate)this;
+            long num = 7;
+            menuViewController1.ModalPresentationStyle = (UIModalPresentationStyle)num;
+            UIDocumentMenuViewController menuViewController2 = menuViewController1;
+            // ISSUE: reference to a compiler-generated method
+            UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController((UIViewController)menuViewController2, true, (Action)null);
+            UIPopoverPresentationController presentationController = menuViewController2.PopoverPresentationController;
+            if (presentationController != null)
+            {
+                presentationController.SourceView = UIApplication.SharedApplication.KeyWindow.RootViewController.View;
+                presentationController.PermittedArrowDirections = UIPopoverArrowDirection.Down;
             }
-
-            this.Handler = null;
-
-            this.Handler = (s, e) =>
-                {
-                    TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
-
-                    tcs?.SetResult(new FileData(e.FileByte, e.FileName, e.FilePath));
-                };
-
+            this.Handler = (EventHandler<FilePickerEventArgs>)null;
+            this.Handler = (EventHandler<FilePickerEventArgs>)((s, e) =>
+            {
+                TaskCompletionSource<FileData> completionSource = Interlocked.Exchange<TaskCompletionSource<FileData>>(ref this._completionSource, (TaskCompletionSource<FileData>)null);
+                if (completionSource == null)
+                    return;
+                FileData result = new FileData(e.FileByte, e.FileName, e.FilePath);
+                completionSource.SetResult(result);
+            });
             return this._completionSource.Task;
         }
-
         public void WasCancelled(UIDocumentMenuViewController documentMenu)
         {
             TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
@@ -158,12 +145,14 @@ namespace LeoJHarris.FilePicker
 
         private int GetRequestId()
         {
-            int id = this._requestId;
-
-            if (this._requestId == int.MaxValue) this._requestId = 0;
-            else this._requestId++;
-
-            return id;
+            int requestId = this._requestId;
+            if (this._requestId == int.MaxValue)
+            {
+                this._requestId = 0;
+                return requestId;
+            }
+            this._requestId = this._requestId + 1;
+            return requestId;
         }
 
         public async Task<string> SaveFileAsync(FileData fileToSave, string optionalFolderName = null)

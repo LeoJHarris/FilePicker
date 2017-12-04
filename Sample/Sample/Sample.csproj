@@ -54,12 +54,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="LeoJHarris.FilePicker, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LeoJHarris.Plugin.FilePicker.1.0.2\lib\portable-net45+wp80+win8+wpa81\LeoJHarris.FilePicker.dll</HintPath>
-    </Reference>
-    <Reference Include="LeoJHarris.FilePicker.Abstractions, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\LeoJHarris.Plugin.FilePicker.1.0.2\lib\portable-net45+wp80+win8+wpa81\LeoJHarris.FilePicker.Abstractions.dll</HintPath>
-    </Reference>
     <Reference Include="Xamarin.Forms.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Xamarin.Forms.2.4.0.280\lib\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.Core.dll</HintPath>
     </Reference>
@@ -72,6 +66,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FilePicker\Plugin.FilePicker.Abstractions\Plugin.FilePicker.Abstractions.csproj">
+      <Project>{6edb0588-ffc5-4ef5-8a99-9e241d0f878d}</Project>
+      <Name>Plugin.FilePicker.Abstractions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\FilePicker\Plugin.FilePicker\Plugin.FilePicker.csproj">
+      <Project>{a6fcef44-d2ba-42c7-b3cb-13667bcd7b54}</Project>
+      <Name>Plugin.FilePicker</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Forms.2.4.0.280\build\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.4.0.280\build\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.targets')" />
