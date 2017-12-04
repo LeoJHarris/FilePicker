@@ -35,7 +35,7 @@
             }
             else
             {
-                await this.DisplayAlert("Name of the file:" + file.FileName + " and path too file", "File info", "OK");
+                await this.DisplayAlert("Name of the file:" + file.FileName + " and path too file: " + file.FilePath, "File info", "OK");
             }
         }
 

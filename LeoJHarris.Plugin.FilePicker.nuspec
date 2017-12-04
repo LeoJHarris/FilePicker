@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8.3">
     <id>LeoJHarris.Plugin.FilePicker</id>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <title>FilePicker Plugin for Xamarin.Forms</title>
     <authors>Leonard Harris</authors>
     <owners>Leonard Harris</owners>
@@ -11,7 +11,13 @@
     <iconUrl>https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/NuGet_project_logo.svg/1200px-NuGet_project_logo.svg.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
-      Advanced entry for Xamarin.forms projects that extends the current Xamarin.forms entry
+     File Picker plugin for Xamarin.Forms to work with local or cloud based files 
+
+Methods available: 
+
+*PickFile 
+*OpenFile 
+*SaveFileAsync
     </description>
     <summary>
      Easy to use file picker plugin for Xamarin.forms
