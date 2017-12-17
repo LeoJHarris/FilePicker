@@ -19,7 +19,7 @@
 
         private async void Button_OnPickerFileClickedAsync(object sender, EventArgs e)
         {
-            this.file = await CrossFilePicker.Current.PickFile().ConfigureAwait(true);
+            this.file = await CrossFilePicker.Current.PickFileAsync().ConfigureAwait(true);
             if (this.file == null)
             {
                 return;
@@ -41,12 +41,18 @@
 
         private async void Button_OnFileSavedClickedAsync(object sender, EventArgs e)
         {
-            string fullPathToFile = await CrossFilePicker.Current.SaveFileAsync(this.file).ConfigureAwait(false);
-            CrossFilePicker.Current.OpenFile(fullPathToFile);
-
-            if (string.IsNullOrEmpty(fullPathToFile))
+            if (this.file != null)
             {
-                await this.DisplayAlert("File was saved", "File was saved", "OK").ConfigureAwait(false);
+
+                string fullPathToFile = await CrossFilePicker.Current.SaveFileAsync(this.file).ConfigureAwait(false);
+
+                if (!string.IsNullOrEmpty(fullPathToFile))
+                {
+                    var open = await this.DisplayAlert("File was saved locally", "Selected file was saved", "Open file", "Cancel").ConfigureAwait(false);
+
+                    if (open)
+                        CrossFilePicker.Current.OpenFile(fullPathToFile);
+                }
             }
         }
 

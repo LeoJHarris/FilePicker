@@ -32,14 +32,7 @@ namespace LeoJHarris.FilePicker
             this._context = Application.Context;
         }
 
-        public async FileData PickFile()
-        {
-            FileData media = await this.TakeMediaAsync("file/*", Intent.ActionGetContent).ConfigureAwait(true);
-
-            return media;
-        }
-
-        private Task<FileData> TakeMediaAsync(string type, string action)
+        public async Task<FileData> PickFileAsync()
         {
             int id = this.GetRequestId();
 
@@ -84,7 +77,7 @@ namespace LeoJHarris.FilePicker
                 Debug.Write(ex);
             }
 
-            return this._completionSource.Task;
+            return await this._completionSource.Task; ;
         }
 
         private int GetRequestId()

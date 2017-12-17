@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8.3">
     <id>LeoJHarris.Plugin.FilePicker</id>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <title>FilePicker Plugin for Xamarin.Forms</title>
     <authors>Leonard Harris</authors>
     <owners>Leonard Harris</owners>
@@ -11,16 +11,16 @@
     <iconUrl>https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/NuGet_project_logo.svg/1200px-NuGet_project_logo.svg.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
-     File Picker plugin for Xamarin.Forms to work with local or cloud based files 
+      File Picker plugin for Xamarin.Forms to work with local or cloud based files
 
-Methods available: 
+      Methods available:
 
-*PickFile 
-*OpenFile 
-*SaveFileAsync
+      *PickFileAsync
+      *OpenFile
+      *SaveFileAsync
     </description>
     <summary>
-     Easy to use file picker plugin for Xamarin.forms
+      Easy to use file picker plugin for Xamarin.forms
     </summary>
   </metadata>
   <files>
@@ -34,16 +34,16 @@ Methods available:
     <file src="FilePicker\Plugin.FilePicker.iOS\bin\iPhone\Release\LeoJHarris.FilePicker*.*" target="lib\Xamarin.iOS10\LeoJHarris.FilePicker.dll" />
 
     <!--Xamarin.Android-->
-    
 
-     <file src="FilePicker\Plugin.FilePicker.Abstractions\bin\Release\LeoJHarris.FilePicker.Abstractions.dll" target="lib\MonoAndroid10\LeoJHarris.FilePicker.Abstractions.dll" />
-     <file src="FilePicker\Plugin.FilePicker.Abstractions\bin\Release\LeoJHarris.FilePicker.Abstractions.xml" target="lib\MonoAndroid10\LeoJHarris.FilePicker.Abstractions.xml" />
-     <file src="FilePicker\Plugin.FilePicker.Abstractions\bin\Release\LeoJHarris.FilePicker.Abstractions.pdb" target="lib\MonoAndroid10\LeoJHarris.FilePicker.Abstractions.pdb" />
-    
 
- <file src="FilePicker\Plugin.FilePicker.Android\bin\Release\LeoJHarris.FilePicker.dll" target="lib\MonoAndroid10\LeoJHarris.FilePicker.dll" />
-     <file src="FilePicker\Plugin.FilePicker.Android\bin\Release\LeoJHarris.FilePicker.xml" target="lib\MonoAndroid10\LeoJHarris.FilePicker.xml" />
-     <file src="FilePicker\Plugin.FilePicker.Android\bin\Release\LeoJHarris.FilePicker.pdb" target="lib\MonoAndroid10\LeoJHarris.FilePicker.pdb" />
+    <file src="FilePicker\Plugin.FilePicker.Abstractions\bin\Release\LeoJHarris.FilePicker.Abstractions.dll" target="lib\MonoAndroid10\LeoJHarris.FilePicker.Abstractions.dll" />
+    <file src="FilePicker\Plugin.FilePicker.Abstractions\bin\Release\LeoJHarris.FilePicker.Abstractions.xml" target="lib\MonoAndroid10\LeoJHarris.FilePicker.Abstractions.xml" />
+    <file src="FilePicker\Plugin.FilePicker.Abstractions\bin\Release\LeoJHarris.FilePicker.Abstractions.pdb" target="lib\MonoAndroid10\LeoJHarris.FilePicker.Abstractions.pdb" />
+
+
+    <file src="FilePicker\Plugin.FilePicker.Android\bin\Release\LeoJHarris.FilePicker.dll" target="lib\MonoAndroid10\LeoJHarris.FilePicker.dll" />
+    <file src="FilePicker\Plugin.FilePicker.Android\bin\Release\LeoJHarris.FilePicker.xml" target="lib\MonoAndroid10\LeoJHarris.FilePicker.xml" />
+    <file src="FilePicker\Plugin.FilePicker.Android\bin\Release\LeoJHarris.FilePicker.pdb" target="lib\MonoAndroid10\LeoJHarris.FilePicker.pdb" />
 
   </files>
 </package>
