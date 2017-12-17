@@ -32,7 +32,7 @@ namespace LeoJHarris.FilePicker
             this._context = Application.Context;
         }
 
-        public async Task<FileData> PickFile()
+        public async FileData PickFile()
         {
             FileData media = await this.TakeMediaAsync("file/*", Intent.ActionGetContent).ConfigureAwait(true);
 

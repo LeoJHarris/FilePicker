@@ -7,7 +7,7 @@
     /// </summary>
     public interface IFilePicker
     {
-        Task<FileData> PickFile();
+        Task<FileData> PickFileAsync();
 
         /// <summary>
         /// Saves the file 

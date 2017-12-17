@@ -43,9 +43,50 @@ namespace LeoJHarris.FilePicker
         public void DidPickDocumentPicker(UIDocumentMenuViewController documentMenu, UIDocumentPickerViewController documentPicker)
         {
             documentPicker.DidPickDocument += this.DocumentPicker_DidPickDocument;
+
+            documentPicker.DidPickDocumentAtUrls += (sender, e) =>
+            {
+                this.Picker_DidPickDocuments((UIDocumentPickerViewController)sender, e.Urls);
+            };
+
             documentPicker.WasCancelled += this.DocumentPicker_WasCancelled;
 
             UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController(documentPicker, true, null);
+        }
+
+        private void Picker_DidPickDocuments(UIDocumentPickerViewController controller, NSUrl[] urls)
+        {
+            foreach (var url in urls) this.Picker_DidPickDocument(controller, url);
+        }
+
+        private void Picker_DidPickDocument(UIDocumentPickerViewController controller, NSUrl url)
+        {
+            bool securityEnabled = url.StartAccessingSecurityScopedResource();
+            UIDocument doc = new UIDocument(url);
+            NSData data = NSData.FromUrl(url);
+            byte[] dataBytes = new byte[data.Length];
+
+            System.Runtime.InteropServices.Marshal.Copy(data.Bytes, dataBytes, 0, Convert.ToInt32(data.Length));
+
+            string filename = doc.LocalizedName;
+            string pathname = doc.FileUrl?.ToString();
+
+            // iCloud drive can return null for LocalizedName.
+            if (filename == null)
+            {
+                // Retrieve actual filename by taking the last entry after / in FileURL.
+                // e.g. /path/to/file.ext -> file.ext
+
+                // filesplit is either:
+                // 0 (pathname is null, or last / is at position 0)
+                // -1 (no / in pathname)
+                // positive int (last occurence of / in string)
+                int filesplit = pathname?.LastIndexOf('/') ?? 0;
+
+                filename = pathname?.Substring(filesplit + 1);
+            }
+
+            this.OnFilePicked(new FilePickerEventArgs(dataBytes, filename, pathname));
         }
 
         private void DocumentPicker_DidPickDocument(object sender, UIDocumentPickedEventArgs e)
@@ -92,50 +133,62 @@ namespace LeoJHarris.FilePicker
             }
         }
 
-        public async Task<FileData> PickFile()
+
+        /// <summary>
+        /// Lets the user pick a file with the systems default file picker
+        /// For iOS iCloud drive needs to be configured
+        /// </summary>
+        /// <returns></returns>
+        public async Task<FileData> PickFileAsync()
         {
-            return await this.TakeMediaAsync();
+            var id = GetRequestId();
+
+            var ntcs = new TaskCompletionSource<FileData>(id);
+
+            if (Interlocked.CompareExchange(ref _completionSource, ntcs, null) != null)
+                throw new InvalidOperationException("Only one operation can be active at a time");
+
+            var allowedUtis = new string[] {
+                                                   UTType.UTF8PlainText,
+                                                   UTType.PlainText,
+                                                   UTType.RTF,
+                                                   UTType.PNG,
+                                                   UTType.Text,
+                                                   UTType.PDF,
+                                                   UTType.Image,
+                                                   UTType.UTF16PlainText,
+                                                   UTType.FileURL
+                                               };
+
+            var importMenu =
+                new UIDocumentMenuViewController(allowedUtis, UIDocumentPickerMode.Import)
+                {
+                    Delegate = this,
+                    ModalPresentationStyle = UIModalPresentationStyle.Popover
+                };
+
+            UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController(importMenu, true, null);
+
+            var presPopover = importMenu.PopoverPresentationController;
+
+            if (presPopover != null)
+            {
+                presPopover.SourceView = UIApplication.SharedApplication.KeyWindow.RootViewController.View;
+                presPopover.PermittedArrowDirections = UIPopoverArrowDirection.Down;
+            }
+
+            Handler = null;
+
+            Handler = (s, e) =>
+                {
+                    var tcs = Interlocked.Exchange(ref _completionSource, null);
+
+                    tcs?.SetResult(new FileData(e.FileByte, e.FileName, e.FilePath));
+                };
+
+            return await _completionSource.Task;
         }
 
-        private Task<FileData> TakeMediaAsync()
-        {
-            if (Interlocked.CompareExchange<TaskCompletionSource<FileData>>(ref this._completionSource, new TaskCompletionSource<FileData>((object)this.GetRequestId()), (TaskCompletionSource<FileData>)null) != null)
-                throw new InvalidOperationException("Only one operation can be active at a time");
-            UIDocumentMenuViewController menuViewController1 = new UIDocumentMenuViewController(new string[9]
-            {
-        (string) UTType.UTF8PlainText,
-        (string) UTType.PlainText,
-        (string) UTType.RTF,
-        (string) UTType.PNG,
-        (string) UTType.Text,
-        (string) UTType.PDF,
-        (string) UTType.Image,
-        (string) UTType.UTF16PlainText,
-        (string) UTType.FileURL
-            }, UIDocumentPickerMode.Import);
-            menuViewController1.Delegate = (IUIDocumentMenuDelegate)this;
-            long num = 7;
-            menuViewController1.ModalPresentationStyle = (UIModalPresentationStyle)num;
-            UIDocumentMenuViewController menuViewController2 = menuViewController1;
-            // ISSUE: reference to a compiler-generated method
-            UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController((UIViewController)menuViewController2, true, (Action)null);
-            UIPopoverPresentationController presentationController = menuViewController2.PopoverPresentationController;
-            if (presentationController != null)
-            {
-                presentationController.SourceView = UIApplication.SharedApplication.KeyWindow.RootViewController.View;
-                presentationController.PermittedArrowDirections = UIPopoverArrowDirection.Down;
-            }
-            this.Handler = (EventHandler<FilePickerEventArgs>)null;
-            this.Handler = (EventHandler<FilePickerEventArgs>)((s, e) =>
-            {
-                TaskCompletionSource<FileData> completionSource = Interlocked.Exchange<TaskCompletionSource<FileData>>(ref this._completionSource, (TaskCompletionSource<FileData>)null);
-                if (completionSource == null)
-                    return;
-                FileData result = new FileData(e.FileByte, e.FileName, e.FilePath);
-                completionSource.SetResult(result);
-            });
-            return this._completionSource.Task;
-        }
         public void WasCancelled(UIDocumentMenuViewController documentMenu)
         {
             TaskCompletionSource<FileData> tcs = Interlocked.Exchange(ref this._completionSource, null);
@@ -145,14 +198,14 @@ namespace LeoJHarris.FilePicker
 
         private int GetRequestId()
         {
-            int requestId = this._requestId;
-            if (this._requestId == int.MaxValue)
-            {
-                this._requestId = 0;
-                return requestId;
-            }
-            this._requestId = this._requestId + 1;
-            return requestId;
+            var id = _requestId;
+
+            if (_requestId == int.MaxValue)
+                _requestId = 0;
+            else
+                _requestId++;
+
+            return id;
         }
 
         public async Task<string> SaveFileAsync(FileData fileToSave, string optionalFolderName = null)
