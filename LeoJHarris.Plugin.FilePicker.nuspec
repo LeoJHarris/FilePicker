@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8.3">
     <id>LeoJHarris.Plugin.FilePicker</id>
-    <version>1.0.4</version>
+    <version>1.0.5-beta</version>
     <title>FilePicker Plugin for Xamarin.Forms</title>
     <authors>Leonard Harris</authors>
     <owners>Leonard Harris</owners>
@@ -22,6 +22,10 @@
     <summary>
       Easy to use file picker plugin for Xamarin.forms
     </summary>
+    <releaseNotes>
+      Updated XForms to 3.0.0.446417.
+      Added additional utils for iOS including audio, video, xls, doc and docx
+    </releaseNotes>
   </metadata>
   <files>
 
