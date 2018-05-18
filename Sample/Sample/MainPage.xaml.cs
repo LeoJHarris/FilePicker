@@ -1,11 +1,9 @@
 ﻿namespace Sample
 {
-    using System;
-    using System.IO;
-
     using LeoJHarris.FilePicker;
     using LeoJHarris.FilePicker.Abstractions;
-
+    using System;
+    using System.IO;
     using Xamarin.Forms;
 
     public partial class MainPage
@@ -35,7 +33,7 @@
             }
             else
             {
-                await this.DisplayAlert("Name of the file:" + file.FileName + " and path too file: " + file.FilePath, "File info", "OK");
+                await this.DisplayAlert("Name of the file:" + file.FileName + " and path too file: " + file.FilePath, "File info", "OK").ConfigureAwait(true);
             }
         }
 

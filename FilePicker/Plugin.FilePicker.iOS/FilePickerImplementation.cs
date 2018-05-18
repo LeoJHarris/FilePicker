@@ -1,21 +1,15 @@
-namespace LeoJHarris.FilePicker
+﻿namespace LeoJHarris.FilePicker
 {
+    using CoreGraphics;
+    using Foundation;
+    using LeoJHarris.FilePicker.Abstractions;
+    using MobileCoreServices;
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-
-    using CoreGraphics;
-
-    using Foundation;
-
-    using LeoJHarris.FilePicker.Abstractions;
-
-    using MobileCoreServices;
-
     using UIKit;
 
     /// <summary>
@@ -157,7 +151,15 @@ namespace LeoJHarris.FilePicker
                                                    UTType.PDF,
                                                    UTType.Image,
                                                    UTType.UTF16PlainText,
-                                                   UTType.FileURL
+                                                   UTType.FileURL,
+                                                   UTType.Video,
+                                                   UTType.Audio,
+                                                   "com.microsoft.word.doc",
+                                                   "org.openxmlformats.wordprocessingml.document",
+                                                   "com.microsoft.powerpoint.​ppt",
+                                                   "org.openxmlformats.spreadsheetml.sheet",
+                                                   "org.openxmlformats.presentationml.presentation",
+                                                   "com.microsoft.excel.xls"
                                                };
 
             var importMenu =
