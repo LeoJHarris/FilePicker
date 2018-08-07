@@ -1,3 +1,5 @@
+**Collaboraters welcome! Submit a feature request, fork the project, add you feature, PR and Ill review and merge :)**
+
 IMPORTANT
 
 Android: The WRITE_EXTERNAL_STORAGE & READ_EXTERNAL_STORAGE permissions are required.
