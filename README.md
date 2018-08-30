@@ -1,30 +1,31 @@
-**Collaboraters welcome! Submit a feature request, fork the project, add you feature, PR and Ill review and merge :)**
+**Collaborators welcome! Submit a feature request, fork the project, add you feature, PR and I'll review and merge :)**
 
 IMPORTANT
 
-Android: The WRITE_EXTERNAL_STORAGE & READ_EXTERNAL_STORAGE permissions are required.
+Android: The `WRITE_EXTERNAL_STORAGE` & `READ_EXTERNAL_STORAGE` permissions are required.
 
 iOS: Need Configure iCloud Driver for your app: https://developer.xamarin.com/guides/ios/deployment,_testing,_and_metrics/provisioning/working-with-capabilities/icloud-capabilities/
 
-USAGES:
+**USAGES:**
 
-PickFileAsync:
-
+ * PickFileAsync:  
+ 
+```csharp
 var file = await CrossFilePicker.Current.PickFileAsync();
             if (file == null)
             {
                 return;
             }
-            
-SaveFileAsync:
-
+ ```           
+ * SaveFileAsync:
+```csharp
 string fullPathToFile = await CrossFilePicker.Current.SaveFileAsync(file);
-
-OpenFile:
-
+```
+ * OpenFile:
+```csharp
 CrossFilePicker.Current.OpenFile(fullPathToFile);
 CrossFilePicker.Current.OpenFile(file);
-
+```
 Bindable properties
 
 The FileData object returned from picking a file contains properties such as the DataArray, FileName etc.
